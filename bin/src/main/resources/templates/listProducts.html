@@ -107,33 +107,6 @@
         <div class="button-container">
             <a href="/products/add" class="btn btn-add">Añadir Producto</a>
         </div>
-        
-        <!-- Formulario de búsqueda -->
-        <form th:action="@{/products/search}" method="get">
-            <input type="text" name="searchTerm" placeholder="Buscar por nombre del producto" th:value="${searchTerm}" />
-            <button type="submit" class="searchButton">
-                🔎
-            </button>
-        </form>
-        
-        <!-- Botón para limpiar el filtro -->
-        <form th:action="@{/products}" method="get">
-            <button type="submit" class="cleanBtn">
-                🧽
-            </button>
-        </form>
-        
-        <!-- Formulario de ordenación -->
-        <form method="GET" action="/products" class="filter">
-		    <select name="orden" class="form-select w-auto" style="min-width: 150px;">
-		        <option value="id" th:selected="${param.orden == 'id'}">Ordenar por ID</option>
-		        <option value="name" th:selected="${param.orden == 'name'}">Ordenar por Nombre</option>
-		    </select>
-		    <button type="submit" class="cleanImg">
-		        <img th:src="@{/icons/filter-icon.png}" alt="Ordenar" class="icon">
-		    </button>
-		</form>
-
 
         <table class="table">
             <thead>
@@ -162,33 +135,6 @@
                 </tr>
             </tbody>
         </table>
-        
-        <div class="pagination">
-					    <!-- Enlace a la primera página -->
-					    <span th:if="${currentPage > 1}">
-					        <a th:href="@{/products(page=0, size=${size}, dato=${dato}, orden=${orden})}" th:text="'1'"></a>
-					    </span>
-					
-					    <!-- Enlace de "Anterior" -->
-					    <a th:href="@{/products(page=${currentPage - 1}, size=${size}, dato=${dato}, orden=${orden})}" th:if="${currentPage > 0}">&laquo;</a>
-					
-					    <!-- Mostrar las páginas adyacentes (anterior, actual, siguiente) -->
-					    <span th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}">
-					        <a th:href="@{/products(page=${i}, size=${size}, dato=${dato}, orden=${orden})}" 
-					           th:text="${i + 1}" 
-					           th:classappend="${i == currentPage ? 'active' : ''}"
-					           th:if="${i >= 0 && i < totalPages}"></a>
-					    </span>
-					
-					    <!-- Mostrar la última página si no estamos cerca de la última página -->
-					    <span th:if="${currentPage < totalPages - 2}">
-					        <a th:href="@{/products(page=${totalPages - 1}, size=${size}, dato=${dato}, orden=${orden})}" 
-					           th:text="${totalPages}"></a>
-					    </span>
-					
-					    <!-- Enlace de "Siguiente" -->
-					    <a th:href="@{/products(page=${currentPage + 1}, size=${size}, dato=${dato}, orden=${orden})}" th:if="${currentPage < totalPages - 1}">&raquo;</a>
-					</div>
     </div>
 </body>
 </html>

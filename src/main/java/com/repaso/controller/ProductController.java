@@ -1,9 +1,11 @@
 package com.repaso.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,9 +47,54 @@ public class ProductController {
     }
 
     @GetMapping
-    public String listProducts(Model model) {
+    public String listProducts(@RequestParam(defaultValue = "0") int page, 
+	        @RequestParam(defaultValue = "5") int size, 
+	        @RequestParam(required = false, defaultValue = "") String dato, 
+	        @RequestParam(required = false, defaultValue = "") String orden, 
+	        Model model) {
         List<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
+        
+     // Filtrar productos si 'dato' no está vacío
+	    List<Product> filteredProducts = products.stream()
+	        .filter(product -> 
+	        product.getName().toLowerCase().contains(dato.toLowerCase())
+	        )
+	        .collect(Collectors.toList());
+	    
+	 // Ordenar la lista filtrada si 'orden' no está vacío
+	    if (!orden.isEmpty()) {
+	        switch (orden) {
+	            case "name":
+	            	filteredProducts.sort(Comparator.comparing(product -> product.getName().toLowerCase()));
+	                break;
+	            default:
+	            	filteredProducts.sort(Comparator.comparing(Product::getId));
+	                break;
+	        }
+	    }
+        
+        int totalProducts = filteredProducts.size();
+	    int totalPages = (int) Math.ceil((double) totalProducts / size);
+	    
+	 // Determinar los usuarios que deben mostrarse en la página actual
+	    int fromIndex = Math.min(page * size, totalProducts);
+	    int toIndex = Math.min((page + 1) * size, totalProducts);
+	    List<Product> productsForPage = products.subList(fromIndex, toIndex);
+	    
+	 // Agregar la lista de usuarios paginada al modelo
+	    model.addAttribute("products", productsForPage);
+	    
+	    
+	 // Datos de paginación
+	    model.addAttribute("totalProducts", totalProducts);
+	    model.addAttribute("resulProducts", totalProducts);
+	    model.addAttribute("currentPage", page);
+	    model.addAttribute("totalPages", totalPages);
+	    
+	 // Páginas anterior y siguiente
+	    model.addAttribute("prevPage", page > 0 ? page - 1 : null);
+	    model.addAttribute("nextPage", page < totalPages - 1 ? page + 1 : null);
+	    
         return "listProducts";
     }
 
@@ -89,6 +136,10 @@ public class ProductController {
     public String editProductForm(Model model, @RequestParam Long id) {
         try {
             Product product = productService.findById(id);
+            if(product == null) {
+            	model.addAttribute("errorMessage", "Producto no encontrado con el ID: " + id);
+                return "error";
+            }
             model.addAttribute("product", product);
             model.addAttribute("action", "/products/edit");
             model.addAttribute("enable", true);
@@ -148,5 +199,27 @@ public class ProductController {
             model.addAttribute("msg", "Error al borrar el producto: " + e.getMessage());
         }
         return "templateProduct";
+    }
+    
+    @GetMapping("/search")
+    public String searchProducts(@RequestParam String searchTerm, 
+            @RequestParam(defaultValue = "0") int page, 
+            @RequestParam(defaultValue = "5") int size, 
+            Model model) {
+    	// Buscar usuarios por nombre o apellido
+        List<Product> listProducts = productService.searchProductsByName(searchTerm, page, size);
+        model.addAttribute("products", listProducts);
+
+        // Agregar datos de paginación
+        long resultProducts = productService.countProductsByName(searchTerm);
+        model.addAttribute("resultProducts", resultProducts);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", (int) Math.ceil((double) resultProducts / size));
+        
+        List<Product> totalProducts = productService.getAllProducts();
+        model.addAttribute("totalProducts", totalProducts);
+
+        // Retornar a la misma plantilla de lista
+        return "listProducts";
     }
 }

@@ -79,7 +79,9 @@
                 <configuration>
                     <source>17</source> <!-- Versión de Java -->
                     <target>17</target> <!-- Versión de Java -->
-                    
+                    <compilerArgs>
+                        <arg>-parameters</arg> <!-- Habilita la opción de parámetros -->
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
