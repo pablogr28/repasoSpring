@@ -113,8 +113,9 @@
     <div class="container">
         <h2>Formulario de Producto</h2>
 
-        <div class="alert alert-success" th:if="${msg}" th:text="${msg}"></div>
-        <div class="alert alert-danger" th:if="${errorMsg}" th:text="${errorMsg}"></div>
+        <div class="alert alert-success" th:if="${msg != null and !msg.isEmpty()}" th:text="${msg}"></div>
+		<div class="alert alert-danger" th:if="${errorMsg != null and !errorMsg.isEmpty()}" th:text="${errorMsg}"></div>
+
 
         <form th:action="@{${action}}" method="post" th:object="${product}">
             <input type="hidden" id="productId" name="id" th:field="*{id}">

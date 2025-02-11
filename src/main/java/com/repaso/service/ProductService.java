@@ -20,28 +20,28 @@ public class ProductService {
 	    private ProductRepository productRepository;
 
 	    /**
-	     * Obtiene todos los empleados de la base de datos.
+	     * Obtiene todos los productos de la base de datos.
 	     */
 	    public List<Product> getAllProducts() {
 	        return productRepository.findAll();
 	    }
 	    
 	    /**
-	     * Busca un empleado por su nombre de usuario.
+	     * Busca un producto por su nombre de usuario.
 	     */
 	    public Product findById(long id) {
 	        return productRepository.findById(id);
 	    }
 
 	    /**
-	     * Guarda un nuevo empleado o actualiza uno existente.
+	     * Guarda un nuevo producto o actualiza uno existente.
 	     */
 	    public void saveProduct(Product product) {
 	    	productRepository.save(product);
 	    }
 
 	    /**
-	     * Elimina un empleado por su username.
+	     * Elimina un producto por su username.
 	     */
 	    public void deleteProduct(long id) {
 	    	productRepository.deleteById(id);
@@ -60,6 +60,10 @@ public class ProductService {
 	    
 	    public long countProductsByName(String name) {
 	        return productRepository.countByNameContainingIgnoreCase(name);
+	    }
+	    
+	    public boolean existsByName(String name) {
+	        return productRepository.findByName(name) != null;
 	    }
 
 }
